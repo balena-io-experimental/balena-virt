@@ -1,0 +1,33 @@
+templates:
+  standard:
+    machine: q35
+    cpu: max
+    smp: 4
+    m: "512M"
+    drives:
+      - if: pflash
+        format: raw
+        unit: 0
+        file: /usr/share/OVMF/x64/OVMF_CODE.fd
+        readonly: true
+      - if: virtio
+        format: qcow2
+        file: guest{{guestId}}.qcow2.snap
+        index: 0
+        media: disk
+    net:
+      nic:
+        model: virtio
+      bridge:
+        br: qemu0
+    chardev: null,id=id
+    serial: none
+    monitor: none
+    append:
+      - "--enable-kvm"
+      - "-nographic"
+
+guests:
+  - template: standard
+    arch: x86_64
+    count: 5
