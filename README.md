@@ -56,3 +56,35 @@ drives:
     index: 0
     media: disk
 ```
+
+## Network Configuration
+### Shared physical device
+First, create a bridge, and assign the physical interface as a slave. This can be done on the host OS using nmcli:
+
+```
+$ nmcli connection add type bridge ifname qemu0
+$ nmcli connection add type bridge-slave ifname eno1 master qemu0
+```
+
+The changes will take affect after rebooting. Upon reconnecting to the device, you should see the physical interface with no address, and the bridge will now have an address.
+
+You can connect your guest to the bridge using the following QEMU options:
+```
+-net nic,model=virtio -net bridge,br=qemu0
+```
+
+This is formatted in the template in the `guests.yaml` file like so:
+```
+net:
+  nic:
+    model: virtio
+  bridge:
+    br: qemu0
+```
+
+You may need to allow forwarding from this bridge:
+```
+$ iptables -I FORWARD -i qemu0 -j ACCEPT
+$ iptables -I FORWARD -o qemu0 -j ACCEPT
+```
+
