@@ -1,0 +1,22 @@
+FROM alpine:3.15.0
+
+RUN apk add --update --no-cache \
+	nodejs~=16 \
+	npm \
+	qemu-img \
+	qemu-system-x86_64 \
+	  && rm -rf /usr/share/qemu/edk2* \
+	&& (apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.15/community ovmf || true)
+
+# create qemu-bridge-helper ACL file
+# https://wiki.qemu.org/Features/HelperNetworking
+RUN mkdir -p /etc/qemu \
+	&& echo "allow all" > /etc/qemu/bridge.conf \
+	&& chmod 0640 /etc/qemu/bridge.conf
+
+WORKDIR /root
+
+COPY package.json *.js ./
+RUN npm i
+
+CMD node index.js
