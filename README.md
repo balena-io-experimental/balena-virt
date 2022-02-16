@@ -23,7 +23,7 @@ The `guests` array specifies which templates to use, and how many instances to l
 
 See `guests.example.yml` for details.
 
-## Disk Configuration
+### Disks
 As mentioned above, templates support variable substitution for identifying resources that aren't shared  between machines. For example, a a disk can be specified like so:
 ```yaml
 drives:
@@ -59,7 +59,7 @@ drives:
     media: disk
 ```
 
-## Network Configuration
+## Networking
 ### Shared physical device
 First, create a bridge, and assign the physical interface as a slave. This can be done on the host OS using nmcli:
 
