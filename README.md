@@ -1,5 +1,7 @@
 # Nested balenaOS
-Run balenaOS on balenaOS, using QEMU and KVM acceleration where available. This allows one machine to run several virtualized instances, which all show up independently on the network and the dashboard. This allows multiple containerized applications to run concurrently on one physical device. It also means balenaOS guests can take advantage of QEMU features such as shared backing images, disk snapshots, rolling back to a previous snapshot, pause and resume, and live migration to another host.
+Run balenaOS on balenaOS, using QEMU and KVM acceleration where available. This allows one machine to run several virtualized instances, which all show up independently on the network and the dashboard. This allows multiple containerized applications to run concurrently on one physical device. There's no complexity of merging compose files and reconciling port conflicts, each application runs on its own virtual device with its own network address.
+
+Additionally, this allows balenaOS guests can take advantage of QEMU features such as shared backing images and disk [snapshots](https://wiki.qemu.org/Documentation/CreateSnapshot) via qcow2 images, rolling back to a previous snapshot, temporary snapshots, [pause and resume](https://qemu-project.gitlab.io/qemu/system/images.html#vm-005fsnapshots), and [live migration](https://developers.redhat.com/blog/2015/03/24/live-migrating-qemu-kvm-virtual-machines) to another host.
 
 # Caveats
 
