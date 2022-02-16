@@ -23,7 +23,8 @@ function renderTemplate(template, vars) {
 }
 
 (async () => {
-	fs.readFile(path.resolve('guests.yml'), 'utf8').then((data) => {
+	const guestConfigPath = process.env.GUEST_CONFIG_PATH || 'guests.yml';
+	fs.readFile(path.resolve(guestConfigPath), 'utf8').then((data) => {
 		return YAML.parse(data);
 	}).then((parsed) => {
 		let templates = {};

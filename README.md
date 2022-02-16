@@ -13,7 +13,7 @@ Additional dependencies are QEMU, and optionally OVMF/AAVMF firmware for UEFI su
 
 ## Configuration
 
-Guests are defined using a `guests.yml` YAML config.  The `templates` array specifies machine configuration templates that can be used to launch fleets. Template variables correlate directly to QEMU command line arguments for the most part, with few exceptions. Notably, the `append` array can be used to add arguments to the command line directly.
+Guests are defined using a `guests.yml` YAML config.  By default, the application looks for this file in the current directly, but the path can be specified as the environment variable `GUEST_CONFIG_PATH`. The `templates` array specifies machine configuration templates that can be used to launch fleets. Template variables correlate directly to QEMU command line arguments for the most part, with few exceptions. Notably, the `append` array can be used to add arguments to the command line directly.
 
 Variable substitution is also supported in templates, using double curly brace (`{{var}}`) syntax. Currently, the `guestId` variable can be substituted, to identify machine specific resources, such as disk, and logs.
 
