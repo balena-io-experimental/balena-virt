@@ -75,6 +75,13 @@ drives:
     media: disk
 ```
 
+If you want to resize an image after it's created, you can do this from the host OS CLI as well:
+```
+$ balena run -it -v ${appid}_resin-data:/mnt alpine \
+  apk add --update qemu-img \
+  && qemu-img resize /mnt/guest0.qcow2 64G
+```
+
 ## Networking
 ### Shared physical device
 First, create a bridge, and assign the physical interface as a slave. This can be done on the host OS using nmcli:
