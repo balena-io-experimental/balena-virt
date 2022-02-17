@@ -40,12 +40,12 @@ See `guests.example.yml` for details.
 | `macAddress` | Unique generated MAC for each guest      |
 
 ### Disks
-As mentioned above, templates support variable substitution for identifying resources that aren't shared  between machines. For example, a a disk can be specified like so:
+As mentioned above, templates support variable substitution for identifying resources that aren't shared between machines. For example, a a disk can be specified like so:
 ```yaml
 drives:
   - if: virtio
     format: raw
-    file: guest{{guestId}}.img
+    file: /data/guest{{guestId}}.img
     index: 0
     media: disk
 ```
@@ -70,7 +70,7 @@ These CoW snapshots can now be used directly by guests:
 drives:
   - if: virtio
     format: qcow2
-    file: guest{{guestId}}.qcow2
+    file: /data/guest{{guestId}}.qcow2
     index: 0
     media: disk
 ```
