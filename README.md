@@ -9,10 +9,6 @@ Because instances are virtualized, applications on separate guests must communic
 
 ## Installation and Usage
 
-Install dependencies using `npm i`, then run with `node index.js`
-
-Additional dependencies are QEMU, and optionally OVMF/AAVMF firmware for UEFI support.
-
 ### BalenaOS
 Deploy with `balena push`
 
@@ -22,6 +18,11 @@ scp -P 22222 rootfs.img root@mydevice.local:/var/lib/docker/volumes/${appid}_res
 ```
 
 This disk image would then be available inside the container at `/data/rootfs.img`.
+
+### Development
+Install dependencies using `npm i`, then run with `node index.js`
+
+Additional dependencies are QEMU, and optionally OVMF/AAVMF firmware for UEFI support.
 
 ## Configuration
 
