@@ -13,6 +13,16 @@ Install dependencies using `npm i`, then run with `node index.js`
 
 Additional dependencies are QEMU, and optionally OVMF/AAVMF firmware for UEFI support.
 
+### BalenaOS
+Deploy with `balena push`
+
+Images and configs can be copied to the named data volume for the application using SCP, assuming you have SSH access:
+```
+scp -P 22222 rootfs.img root@mydevice.local:/var/lib/docker/volumes/${appid}_resin-data/_data/
+```
+
+This disk image would then be available inside the container at `/data/rootfs.img`.
+
 ## Configuration
 
 Guests are defined using a `guests.yml` YAML config.  By default, the application looks for this file in the current directly, but the path can be specified as the environment variable `GUEST_CONFIG_PATH`. The `templates` array specifies machine configuration templates that can be used to launch fleets. Template variables correlate directly to QEMU command line arguments for the most part, with few exceptions. Notably, the `append` array can be used to add arguments to the command line directly.
