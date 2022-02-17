@@ -86,12 +86,13 @@ function generateMacAddress(prefix, inputs) {
 					});
 				}));
 			}
-
-			return Promise.all(children);
 		});
+
+		return Promise.all(children);
 	}).then((children) => {
 		return new Promise((resolve, reject) => {
 			// TODO: handle VM exits, crashes, etc.
+			console.log('All instances are running');
 		});
 	});
 })();
