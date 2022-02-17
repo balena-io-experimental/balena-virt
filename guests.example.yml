@@ -18,6 +18,7 @@ templates:
     net:
       nic:
         model: virtio
+        macaddr: "{{macAddress}}"
       bridge:
         br: qemu0
     chardev: null,id=id

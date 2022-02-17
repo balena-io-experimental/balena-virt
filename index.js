@@ -5,6 +5,8 @@ const path = require('path');
 const YAML = require('yaml');
 const { spawn } = require('child_process');
 const { formatCmdline } = require('./cmdline');
+const crypto = require('crypto');
+const os = require('os');
 
 function renderTemplate(template, vars) {
 	return template.map((element) => {
@@ -22,6 +24,17 @@ function renderTemplate(template, vars) {
 	});
 }
 
+function generateMacAddress(prefix, inputs) {
+	const hash = crypto.createHash('sha256');
+	inputs.forEach(input => hash.update(input));
+	const unique = hash.digest('hex')
+		.slice(0, 6)
+		.replace(/(..)/g, '$1:')
+		.slice(0, -1);
+
+	return `${prefix}${unique}`;
+}
+
 (async () => {
 	const guestConfigPath = process.env.GUEST_CONFIG_PATH || 'guests.yml';
 	fs.readFile(path.resolve(guestConfigPath), 'utf8').then((data) => {
@@ -37,9 +50,21 @@ function renderTemplate(template, vars) {
 			const { arch, count, template } = instance;
 			console.log(`Spawning ${count} ${arch} children using template '${template}'`);
 
+			const qemuMacPrefix = '52:54:00:';
+			/* Use the first physical MAC in combination with the guestId to seed the
+			 * unique MAC for the virtual interface.
+			 */
+			const interfaces = os.networkInterfaces();
+			delete interfaces.lo;
+			const physicalMac = interfaces[Object.keys(interfaces)[0]][0].mac;
+
 			for (let i = 0; i < count; i++) {
 				const renderedTemplate = renderTemplate(templates[template], {
 					guestId: i,
+					macAddress: generateMacAddress(
+						qemuMacPrefix,
+						[physicalMac, `${i}`],
+					)
 				});
 
 				children.push(new Promise((resolve, reject) => {

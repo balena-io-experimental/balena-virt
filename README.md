@@ -17,11 +17,17 @@ Additional dependencies are QEMU, and optionally OVMF/AAVMF firmware for UEFI su
 
 Guests are defined using a `guests.yml` YAML config.  By default, the application looks for this file in the current directly, but the path can be specified as the environment variable `GUEST_CONFIG_PATH`. The `templates` array specifies machine configuration templates that can be used to launch fleets. Template variables correlate directly to QEMU command line arguments for the most part, with few exceptions. Notably, the `append` array can be used to add arguments to the command line directly.
 
-Variable substitution is also supported in templates, using double curly brace (`{{var}}`) syntax. Currently, the `guestId` variable can be substituted, to identify machine specific resources, such as disk, and logs.
+Variable substitution is also supported in templates, using double curly brace (`{{var}}`) syntax. For example, the `guestId` variable can be substituted in strings, to identify machine specific resources, such as disk images, and logs.
 
 The `guests` array specifies which templates to use, and how many instances to launch per template.
 
 See `guests.example.yml` for details.
+
+### Template Variables
+| Variable     | Description                              |
+| ------------ | ---------------------------------------- |
+| `guestId`    | Unique numeric identifier for each guest |
+| `macAddress` | Unique generated MAC for each guest      |
 
 ### Disks
 As mentioned above, templates support variable substitution for identifying resources that aren't shared  between machines. For example, a a disk can be specified like so:
