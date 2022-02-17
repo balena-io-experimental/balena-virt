@@ -61,7 +61,7 @@ After converting our raw image to qcow2, we can create additional CoW snapshot i
 
 ```bash
 for i in {0..4}; do \
-qemu-img create -f qcow2 -F qcow2 -b rootfs.qcow2 guest${i}.qcow2 \
+qemu-img create -f qcow2 -F qcow2 -b rootfs.qcow2 guest${i}.qcow2 32G \
 done
 ```
 
