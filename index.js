@@ -91,6 +91,12 @@ function generateMacAddress(prefix, inputs) {
 		return Promise.all(children);
 	}).then((children) => {
 		return new Promise((resolve, reject) => {
+			children.forEach(child => {
+				child.on('close', (code, signal) => {
+					console.log(`QEMU instance with PID ${child.pid} exited with code: ${code}, signal: ${signal}`);
+				});
+			});
+
 			// TODO: handle VM exits, crashes, etc.
 			console.log('All instances are running');
 		});
