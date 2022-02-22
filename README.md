@@ -14,7 +14,7 @@ Deploy with `balena push`
 
 Images and configs can be copied to the named data volume for the application using SCP, assuming you have SSH access:
 ```
-scp -P 22222 rootfs.img root@mydevice.local:/var/lib/docker/volumes/${appid}_resin-data/_data/
+$ scp -P 22222 rootfs.img root@mydevice.local:/var/lib/docker/volumes/${appid}_resin-data/_data/
 ```
 
 This disk image would then be available inside the container at `/data/rootfs.img`.
@@ -61,7 +61,7 @@ A raw image can be converted to qcow2 like so:
 After converting our raw image to qcow2, we can create additional CoW snapshot images using the original as a backing store:
 
 ```bash
-for i in {0..4}; do \
+$ for i in {0..4}; do \
 qemu-img create -f qcow2 -F qcow2 -b rootfs.qcow2 guest${i}.qcow2 32G \
 done
 ```
