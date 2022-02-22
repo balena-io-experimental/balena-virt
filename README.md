@@ -12,9 +12,20 @@ Because instances are virtualized, applications on separate guests must communic
 ### BalenaOS
 Deploy with `balena push`
 
+Grab a balenaOS image for your guest(s) using the dashboard, or CLI:
+```
+$ balena os download genericx86-64-ext -o rootfs.img
+```
+
 Images and configs can be copied to the named data volume for the application using SCP, assuming you have SSH access:
 ```
 $ scp -P 22222 rootfs.img root@mydevice.local:/var/lib/docker/volumes/${appid}_resin-data/_data/
+```
+
+The config can be edited on your device from the dashboard inside the `main` container, or using SSH:
+```
+$ balena ssh mydevice.local main
+~ # vi /data/guests.yml
 ```
 
 This disk image would then be available inside the container at `/data/rootfs.img`.
