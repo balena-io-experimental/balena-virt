@@ -2,25 +2,32 @@ templates:
   standard:
     machine: q35
     cpu: max
-    smp: 4
+    smp: cores=4
     m: "512M"
     drives:
+      # OVMF, used to support UEFI booting
+      # https://github.com/tianocore/edk2/blob/b24306f15daa2ff8510b06702114724b33895d3c/OvmfPkg/README#L60
       - if: pflash
         format: raw
         unit: 0
         file: /usr/share/OVMF/x64/OVMF_CODE.fd
         readonly: true
+      # Disk image, use a qcow2 identified by the template variable 'guestId',
+      # backed by another image to save space
       - if: virtio
         format: qcow2
         file: guest{{guestId}}.qcow2.snap
         index: 0
         media: disk
+    # Create a virtio NIC and add it to a bridge
     net:
       nic:
         model: virtio
         macaddr: "{{macAddress}}"
       bridge:
         br: qemu0
+    # Disable the serial console and monitor, this makes shutdown/restart
+    # cleaner, and lets us inherit stdout for debugging
     chardev: null,id=id
     serial: none
     monitor: none
