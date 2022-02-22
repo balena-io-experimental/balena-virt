@@ -73,17 +73,11 @@ function generateMacAddress(prefix, inputs) {
 						renderedTemplate,
 						{ stdio: 'inherit' }
 					);
-					proc.on('data', (data) => console.log);
-					proc.on('exit', (code, signal) => {
+					proc.on('exit', (code) => {
 						reject(new Error(`QEMU exited with code ${code}`));
 					});
-					proc.on('error', (error) => {
-						reject(error);
-					});
-
-					proc.on('spawn', () => {
-						resolve(proc);
-					});
+					proc.on('error', error => reject);
+					proc.on('spawn', () => { resolve(proc); });
 				}));
 			}
 		});
