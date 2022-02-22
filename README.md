@@ -87,7 +87,7 @@ drives:
     media: disk
 ```
 
-If you want to resize an image after it's created, you can do this from the host OS CLI as well:
+If you want to resize an image after it's created, you can do this from the host OS CLI as well. Make sure to power off the guest before attempting to resize the disk:
 ```
 $ balena run -it -v ${appid}_resin-data:/mnt alpine \
   apk add --update qemu-img \
