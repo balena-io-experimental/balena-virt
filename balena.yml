@@ -1,0 +1,18 @@
+name: balenaNested
+type: sw.application
+description: >-
+  Launch fleets of virtual balenaOS devices using YAML templates
+assets:
+  repository:
+    type: blob.asset
+    data:
+      url:
+        'https://github.com/balena-io-playground/balena-nested'
+data:
+  applicationEnvironmentVariables:
+    - GUEST_CONFIG_PATH: /data/guests.yml
+  defaultDeviceType: genericx86-64-ext
+  supportedDeviceTypes:
+    - genericx86-64-ext
+    - intel-nuc
+version: 0.1.0
