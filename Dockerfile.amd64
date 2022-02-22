@@ -7,19 +7,19 @@ RUN apk add --update --no-cache \
 	  && rm -rf /usr/share/qemu/edk2* \
 	&& (apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.15/community ovmf || true)
 
+WORKDIR /root
+
 FROM base AS build
 
 # install npm in a separate build stage to save space in the runtime image
 RUN apk add --update --no-cache npm
-
-WORKDIR /root
 
 COPY package.json *.js ./
 RUN npm i
 
 FROM base AS run
 
-COPY --from=build /root/node_modules /root/index.js /root/
+COPY --from=build /root/ /root/
 
 # create qemu-bridge-helper ACL file
 # https://wiki.qemu.org/Features/HelperNetworking
@@ -27,4 +27,4 @@ RUN mkdir -p /etc/qemu \
 	&& echo "allow all" > /etc/qemu/bridge.conf \
 	&& chmod 0640 /etc/qemu/bridge.conf
 
-CMD node index.js
+CMD ./cli.js

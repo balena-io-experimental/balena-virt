@@ -2,7 +2,9 @@
   "name": "balena-nested",
   "version": "1.0.0",
   "description": "Nested balenaOS",
-  "main": "index.js",
+  "bin": {
+	  "balena-nested": "./cli.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
