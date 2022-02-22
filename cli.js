@@ -6,7 +6,7 @@ const fs = require('mz/fs');
 const path = require('path');
 const YAML = require('yaml');
 const { spawn } = require('child_process');
-const { formatCmdline } = require('./cmdline');
+const { formatCmdline } = require('./parser');
 const crypto = require('crypto');
 const os = require('os');
 
