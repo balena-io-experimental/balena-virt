@@ -125,3 +125,13 @@ $ iptables -I FORWARD -i qemu0 -j ACCEPT
 $ iptables -I FORWARD -o qemu0 -j ACCEPT
 ```
 
+## Tips and Tricks
+### Get guest `cmdline` from MAC address
+At times, you may want to act on a specific guest, such as resizing the disk image, or other management tasks. In order to do this, you need to get the command line used to launch that specific guest, to figure out what the variables from the template were populated with.
+
+One way to do this is to get the MAC address of the guest, either from the dashboard or SSH, then grep `/proc` for that MAC.
+
+From the host OS of the hypervisor:
+```
+$ cat $(grep -ir "${mac_address}" /proc/*/cmdline | head -1 | cut -d: -f1) | tr '\000' ' '
+```
