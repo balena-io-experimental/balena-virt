@@ -24,9 +24,10 @@ templates:
     chardev: null,id=id
     serial: none
     monitor: none
-    append:
-      - "--enable-kvm"
-      - "-nographic"
+    # enable hardware accelerated virtualization
+    enable-kvm:
+    # disable graphics/windowing
+    nographic:
 
 guests:
   - template: standard

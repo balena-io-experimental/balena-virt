@@ -27,9 +27,6 @@ module.exports = {
 		let cmdline = [];
 		for (const [key, value] of Object.entries(template)) {
 			switch(key) {
-				case 'append':
-					cmdline = cmdline.concat(value);
-					break;
 				case 'drives':
 					cmdline = cmdline.concat(formatEntry(value, {
 						itemPrepend: '-drive',
@@ -42,7 +39,9 @@ module.exports = {
 					}));
 					break;
 				default:
-					cmdline = cmdline.concat([`-${key}`, value]);
+					let arg = [`-${key}`]
+					if (value) arg.push(value);
+					cmdline = cmdline.concat(arg);
 			}
 		}
 
