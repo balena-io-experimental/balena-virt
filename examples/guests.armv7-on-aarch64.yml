@@ -1,0 +1,43 @@
+# This example shows how to boot an armv7 image with UEFI support on an
+# aarch64 host using KVM acceleration. Fedora IoT armhfp images are compatible
+# with this approach.
+
+templates:
+  standard:
+    machine: type=virt,gic_version=host,accel=kvm
+    # disable aarch64 to boot our 32-bit AAVMF firmware
+    cpu: host,aarch64=off
+    smp: cores=4
+    m: 2G
+    drives:
+      # Setup edk2 AVMF firmware, similar to x86_64 example.
+      # This path is correct for Alpine with the qemu package installed,
+      # it will vary for other distros
+      - if: pflash
+        format: raw
+        unit: 0
+        file: /usr/share/qemu/edk2-arm-code.fd
+      - if: virtio
+        format: qcow2
+        file: /data/guest{{guestId}}.qcow2
+        index: 0
+        media: disk
+    # Create a virtio NIC and add it to a bridge
+    net:
+      nic:
+        model: virtio
+        macaddr: "{{macAddress}}"
+      bridge:
+        br: qemu0
+    # disable serial output
+    chardev: null,id=id
+    serial: none
+    monitor: none
+    # disable graphics/windowing
+    nographic:
+
+guests:
+  - template: standard
+    arch: aarch64
+    count: 1
+
