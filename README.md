@@ -43,7 +43,7 @@ Variable substitution is also supported in templates, using double curly brace (
 
 The `guests` array specifies which templates to use, and how many instances to launch per template.
 
-See `guests.example.yml` for details.
+See the `examples/` directory for details.
 
 ### Template Variables
 | Variable     | Description                              |
