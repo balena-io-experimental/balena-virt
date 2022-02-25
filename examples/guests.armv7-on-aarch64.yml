@@ -9,7 +9,7 @@ templates:
     cpu: host,aarch64=off
     smp: cores=4
     m: 2G
-    drives:
+    drive:
       # Setup edk2 AVMF firmware, similar to x86_64 example.
       # This path is correct for Alpine with the qemu package installed,
       # it will vary for other distros
@@ -24,10 +24,10 @@ templates:
         media: disk
     # Create a virtio NIC and add it to a bridge
     net:
-      nic:
+      - nic:
         model: virtio
         macaddr: "{{macAddress}}"
-      bridge:
+      - bridge:
         br: qemu0
     # disable serial output
     chardev: null,id=id

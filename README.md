@@ -55,7 +55,7 @@ See the `examples/` directory for details.
 ### Disks
 As mentioned above, templates support variable substitution for identifying resources that aren't shared between machines. For example, a a disk can be specified like so:
 ```yaml
-drives:
+drive:
   - if: virtio
     format: raw
     file: /data/guest{{guestId}}.img
@@ -80,7 +80,7 @@ done
 
 These CoW snapshots can now be used directly by guests:
 ```yaml
-drives:
+drive:
   - if: virtio
     format: qcow2
     file: /data/guest{{guestId}}.qcow2

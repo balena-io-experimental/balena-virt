@@ -1,16 +1,26 @@
 'use strict';
 
-function formatEntry(obj, options={
-	keyValueDelim: '=',
-	paramDelim: ',',
+function formatArray(arr, options={
 	itemPrepend: null,
 }) {
 	let out = [];
-	for (const [key, value] of Object.entries(obj)) {
-		let fmtVal = (value instanceof Object)
-			? formatEntry(value) : value;
-		const preamble = (obj instanceof Array) ? [] : [key, options.keyValueDelim];
+	for (const item of arr) {
 		if (options.itemPrepend) out.push(options.itemPrepend);
+		let fmtVal = formatEntry(item);
+		out.push(fmtVal);
+	}
+
+	return out;
+}
+
+function formatObject(obj, options={
+	keyValueDelim: '=',
+	paramDelim: ',',
+}) {
+	let out = [];
+	for (const [key, value] of Object.entries(obj)) {
+		let fmtVal = formatEntry(value);
+		const preamble = [key, (value !== null) ? options.keyValueDelim : ''];
 		out.push(
 			preamble.concat(
 				(fmtVal instanceof Array) ? fmtVal : [fmtVal]
@@ -18,6 +28,35 @@ function formatEntry(obj, options={
 		);
 	}
 
+	console.log(out);
+	return out;
+}
+
+function formatEntry(entry, options={
+	paramDelim: ',',
+	itemPrepend: null,
+}) {
+	let out = [];
+	if (entry == null) {
+		if (options.itemPrepend) out.push(options.itemPrepend);
+	} else {
+		switch (entry.constructor) {
+			case Object:
+				if (options.itemPrepend) out.push(options.itemPrepend);
+				out = out.concat(formatObject(entry));
+				break;
+			case Array:
+				out = out.concat(formatArray(entry, options));
+				break
+			case Number:
+			case String:
+				if (options.itemPrepend) out.push(options.itemPrepend);
+				out = out.concat(entry);
+				break;
+		}
+	}
+
+	console.log(out);
 	return options.paramDelim != null
 		? out.join(options.paramDelim) : out;
 }
@@ -26,23 +65,9 @@ module.exports = {
 	formatCmdline: (template) => {
 		let cmdline = [];
 		for (const [key, value] of Object.entries(template)) {
-			switch(key) {
-				case 'drives':
-					cmdline = cmdline.concat(formatEntry(value, {
-						itemPrepend: '-drive',
-					}));
-					break;
-				case 'net':
-					cmdline = cmdline.concat(formatEntry(value, {
-						itemPrepend: '-net',
-						keyValueDelim: ',',
-					}));
-					break;
-				default:
-					let arg = [`-${key}`]
-					if (value) arg.push(value);
-					cmdline = cmdline.concat(arg);
-			}
+			cmdline = cmdline.concat(
+				formatEntry(value, {itemPrepend: `-${key}`})
+			);
 		}
 
 		return cmdline;
