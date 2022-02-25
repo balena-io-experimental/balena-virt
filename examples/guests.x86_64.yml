@@ -16,7 +16,7 @@ templates:
       # backed by another image to save space
       - if: virtio
         format: qcow2
-        file: guest{{guestId}}.qcow2.snap
+        file: {{templateName}}{{guestId}}.qcow2
         index: 0
         media: disk
     # Create a virtio NIC and add it to a bridge

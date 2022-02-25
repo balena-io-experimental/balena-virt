@@ -19,7 +19,7 @@ templates:
         file: /usr/share/qemu/edk2-arm-code.fd
       - if: virtio
         format: qcow2
-        file: /data/guest{{guestId}}.qcow2
+        file: /data/{{templateName}}{{guestId}}.qcow2
         index: 0
         media: disk
     # Create a virtio NIC and add it to a bridge

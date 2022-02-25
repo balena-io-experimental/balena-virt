@@ -66,7 +66,8 @@ function generateMacAddress(prefix, inputs) {
 					macAddress: generateMacAddress(
 						qemuMacPrefix,
 						[physicalMac, `${i}`],
-					)
+					),
+					templateName: template,
 				});
 
 				children.push(new Promise((resolve, reject) => {

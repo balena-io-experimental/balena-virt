@@ -46,10 +46,11 @@ The `guests` array specifies which templates to use, and how many instances to l
 See the `examples/` directory for details.
 
 ### Template Variables
-| Variable     | Description                              |
-| ------------ | ---------------------------------------- |
-| `guestId`    | Unique numeric identifier for each guest |
-| `macAddress` | Unique generated MAC for each guest      |
+| Variable       | Description                                             |
+| -------------- | ------------------------------------------------------- |
+| `guestId`      | Unique numeric identifier for each guest within a fleet |
+| `macAddress`   | Unique generated MAC for each guest                     |
+| `templateName` | Name of the template used to create the fleet           |
 
 ### Disks
 As mentioned above, templates support variable substitution for identifying resources that aren't shared between machines. For example, a a disk can be specified like so:
