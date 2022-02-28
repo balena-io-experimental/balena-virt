@@ -31,7 +31,7 @@ $ balena ssh mydevice.local main
 This disk image would then be available inside the container at `/data/rootfs.img`.
 
 ### Development
-Install dependencies using `npm i`, then run with `node index.js`
+Install dependencies using `npm i`, then run with `node cli.js`
 
 Additional dependencies are QEMU, and optionally OVMF/AAVMF firmware for UEFI support.
 
