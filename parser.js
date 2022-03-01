@@ -28,7 +28,6 @@ function formatObject(obj, options={
 		);
 	}
 
-	console.log(out);
 	return out;
 }
 
@@ -56,7 +55,6 @@ function formatEntry(entry, options={
 		}
 	}
 
-	console.log(out);
 	return options.paramDelim != null
 		? out.join(options.paramDelim) : out;
 }
