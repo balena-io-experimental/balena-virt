@@ -52,4 +52,26 @@ describe('formatCmdline', () => {
 			'chardev': 'null,id=id'
 		})).toEqual(expect.arrayContaining(expected));
 	});
+
+	it('should accept sequences for non-unique properties of arguments', () => {
+		const expected = [
+			'-netdev',
+			'user,id=foo,dns=127.0.0.1,guestfwd=tcp:10.0.0.2:80-cmd:netcat haproxy 80,'
+			+ 'guestfwd=tcp:10.0.0.2:443-cmd:netcat haproxy 443'
+		];
+
+		expect(formatCmdline({
+			netdev: [
+				{
+					'user': null,
+					'id': 'foo',
+					'dns': '127.0.0.1',
+					'guestfwd': [
+						'tcp:10.0.0.2:80-cmd:netcat haproxy 80',
+						'tcp:10.0.0.2:443-cmd:netcat haproxy 443'
+					]
+				},
+			]
+		})).toEqual(expect.arrayContaining(expected));
+	});
 });

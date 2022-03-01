@@ -2,12 +2,17 @@
 
 function formatArray(arr, options={
 	itemPrepend: null,
+	prependDelim: null,
 }) {
 	let out = [];
 	for (const item of arr) {
-		if (options.itemPrepend) out.push(options.itemPrepend);
 		let fmtVal = formatEntry(item);
-		out.push(fmtVal);
+		if (options.itemPrepend && !options.prependDelim) {
+			out.push(options.itemPrepend);
+			out.push(fmtVal);
+		} else {
+			out.push(`${options.itemPrepend}${options.prependDelim}${fmtVal}`);
+		}
 	}
 
 	return out;
@@ -19,8 +24,16 @@ function formatObject(obj, options={
 }) {
 	let out = [];
 	for (const [key, value] of Object.entries(obj)) {
-		let fmtVal = formatEntry(value);
-		const preamble = [key, (value !== null) ? options.keyValueDelim : ''];
+		let opts = {};
+		let preamble = [];
+		if (value instanceof Array) {
+			opts.paramDelim = ',';
+			opts.itemPrepend = key;
+			opts.prependDelim = options.keyValueDelim;
+		} else {
+			preamble = [key, (value !== null) ? options.keyValueDelim : ''];
+		}
+		let fmtVal = formatEntry(value, opts);
 		out.push(
 			preamble.concat(
 				(fmtVal instanceof Array) ? fmtVal : [fmtVal]
