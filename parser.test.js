@@ -53,6 +53,25 @@ describe('formatCmdline', () => {
 		})).toEqual(expect.arrayContaining(expected));
 	});
 
+	it('should format booleans, numbers, and strings', () => {
+		const expected = [
+			'-drive',
+			'if=pflash,format=raw,unit=0,file=/usr/share/OVMF/OVMF_CODE.fd,readonly=true'
+		];
+
+		expect(formatCmdline({
+			drive: [
+				{
+					'if': 'pflash',
+					'format': 'raw',
+					'unit': 0,
+					'file': '/usr/share/OVMF/OVMF_CODE.fd',
+					'readonly': true,
+				}
+			]
+		})).toEqual(expect.arrayContaining(expected));
+	});
+
 	it('should accept sequences for non-unique properties of arguments', () => {
 		const expected = [
 			'-netdev',

@@ -60,6 +60,7 @@ function formatEntry(entry, options={
 			case Array:
 				out = out.concat(formatArray(entry, options));
 				break
+			case Boolean:
 			case Number:
 			case String:
 				if (options.itemPrepend) out.push(options.itemPrepend);
