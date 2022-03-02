@@ -13,6 +13,8 @@ data:
     - GUEST_CONFIG_PATH: /data/guests.yml
   defaultDeviceType: genericx86-64-ext
   supportedDeviceTypes:
+    - generic-aarch64
     - genericx86-64-ext
     - intel-nuc
+    - raspberrypi4-64
 version: 0.1.0
