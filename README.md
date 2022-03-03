@@ -114,9 +114,9 @@ You can connect your guest to the bridge using the following QEMU options:
 This is formatted in the template in the `guests.yaml` file like so:
 ```
 net:
-  nic:
+  - nic:
     model: virtio
-  bridge:
+  - bridge:
     br: qemu0
 ```
 
