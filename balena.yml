@@ -2,6 +2,7 @@ name: balenaVirt
 type: sw.application
 description: >-
   Easily run virtual machines on balenaOS, powered by QEMU and KVM.
+joinable: false
 assets:
   repository:
     type: blob.asset
