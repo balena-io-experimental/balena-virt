@@ -1,13 +1,16 @@
-name: balenaNested
+name: balenaVirt
 type: sw.application
 description: >-
-  Launch fleets of virtual balenaOS devices using YAML templates
+  Easily run virtual machines on balenaOS, powered by QEMU and KVM.
 assets:
   repository:
     type: blob.asset
     data:
-      url:
-        'https://github.com/balena-io-playground/balena-nested'
+      url: 'https://github.com/balena-io-playground/balena-virt'
+  logo:
+    type: blob.asset
+    data:
+      url: 'https://raw.githubusercontent.com/balena-io-playground/balenaVirt/master/logo.png'
 data:
   applicationEnvironmentVariables:
     - GUEST_CONFIG_PATH: /data/guests.yml
