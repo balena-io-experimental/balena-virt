@@ -7,7 +7,7 @@ assets:
   repository:
     type: blob.asset
     data:
-      url: 'https://github.com/balena-io-playground/balena-virt'
+      url: 'https://github.com/balena-io-playground/balenaVirt'
   logo:
     type: blob.asset
     data:
