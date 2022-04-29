@@ -44,6 +44,11 @@ function generateMacAddress(prefix, inputs) {
 	}).then((parsed) => {
 		let templates = {};
 		for (const [key, value] of Object.entries(parsed.templates)) {
+			if (!value) {
+				console.warn(`WARNING: template '${key}' is empty, skipping`);
+				continue;
+			}
+
 			templates[key] = formatCmdline(value);
 		}
 
