@@ -40,7 +40,7 @@ function generateMacAddress(prefix, inputs) {
 (async () => {
 	const guestConfigPath = process.env.GUEST_CONFIG_PATH || 'guests.yml';
 	fs.readFile(path.resolve(guestConfigPath), 'utf8').then((data) => {
-		return YAML.parse(data);
+		return YAML.parse(data, { merge: true });
 	}).then((parsed) => {
 		let templates = {};
 		for (const [key, value] of Object.entries(parsed.templates)) {
