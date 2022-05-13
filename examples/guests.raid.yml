@@ -1,0 +1,53 @@
+templates:
+  base: &base
+    machine: q35
+    # cpu model, 'max' advertises the full capabilities of the host
+    cpu: max
+    smp: cores=4
+    m: 6G
+    net:
+      - nic:
+        model: virtio
+        macaddr: "{{macAddress}}"
+      - bridge:
+        br: qemu0
+    enable-kvm:
+    nographic:
+  # Firmware
+  # https://github.com/tianocore/edk2/blob/b24306f15daa2ff8510b06702114724b33895d3c/OvmfPkg/README#L60
+  uefi: &uefi
+    if: pflash
+    format: raw
+    unit: 0
+    file: /usr/share/OVMF/OVMF_CODE.fd
+    readonly: true
+  standard:
+    << : *base
+    drive:
+      - *uefi
+      # use a qcow2 image, identified by the template variable 'guestId', backed by another image
+      - if: virtio
+        format: qcow2
+        file: /data/guest{{guestId}}.qcow2.snap
+        media: disk
+
+  raid:
+    << : *base
+    drive:
+      - *uefi
+      - if: virtio
+        format: qcow2
+        file: /data/raid.qcow2.snap
+        media: disk
+      - if: virtio
+        format: raw
+        file: /data/storage-n1.raw
+        media: disk
+      - if: virtio
+        format: raw
+        file: /data/storage-n2.raw
+
+guests:
+  - template: raid
+    arch: x86_64
+    count: 1
