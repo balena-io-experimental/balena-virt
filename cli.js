@@ -9,6 +9,18 @@ const { spawn } = require('child_process');
 const { formatCmdline } = require('./parser');
 const crypto = require('crypto');
 const os = require('os');
+const yargs = require('yargs');
+const { hideBin } = require('yargs/helpers');
+const argv = yargs(hideBin(process.argv))
+	.usage('Usage: $0 [-c config] [-p template] [-d]')
+	.alias ('c', 'config')
+	.describe('c', 'Path to YAML guest config')
+	.default('c', 'guests.yml')
+	.alias('p', 'parse')
+	.describe('p', 'Parse YAML guest template and output the resulting QEMU cmdline')
+	.alias('d', 'dry-run')
+	.describe('d', 'Perform a dry run. Combined with -p, this can be used to show the QEMU cmdline and exit.')
+	.argv
 
 function renderTemplate(template, vars) {
 	return template.map((element) => {
@@ -38,7 +50,7 @@ function generateMacAddress(prefix, inputs) {
 }
 
 (async () => {
-	const guestConfigPath = process.env.GUEST_CONFIG_PATH || 'guests.yml';
+	const guestConfigPath = process.env.GUEST_CONFIG_PATH || argv.config;
 	fs.readFile(path.resolve(guestConfigPath), 'utf8').then((data) => {
 		return YAML.parse(data, { merge: true });
 	}).then((parsed) => {
@@ -55,7 +67,10 @@ function generateMacAddress(prefix, inputs) {
 		let children = [];
 		parsed.guests.forEach(instance => {
 			const { arch, count, template } = instance;
-			console.log(`Spawning ${count} ${arch} children using template '${template}'`);
+
+			if (!argv.dryRun) {
+				console.log(`Spawning ${count} ${arch} children using template '${template}'`);
+			}
 
 			const qemuMacPrefix = '52:54:00:';
 			/* Use the first physical MAC in combination with the guestId to seed the
@@ -74,6 +89,14 @@ function generateMacAddress(prefix, inputs) {
 					),
 					templateName: template,
 				});
+
+				if ((argv.parse === true)
+						|| (argv.parse instanceof Array && argv.parse.indexOf(template) > -1)
+						|| argv.parse === template) {
+					console.log(`[${template}]: qemu-system-${arch} ${renderedTemplate.join(' ')}`);
+				}
+
+				if (argv.dryRun) return;
 
 				children.push(new Promise((resolve, reject) => {
 					const proc = spawn(
