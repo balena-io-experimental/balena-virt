@@ -1,0 +1,31 @@
+templates:
+  standard:
+    machine: virt
+    # qemu-system-aarch64 defaults to cortex-a15, so -cpu is required for 64-bit OSes
+    cpu:  cortex-a53
+    smp: cores=4
+    m: 2G
+    drive:
+      - if: pflash
+        format: raw
+        unit: 0
+        file: /usr/share/qemu/edk2-aarch64-code.fd
+      - if: virtio
+        format: qcow2
+        unit: 0
+        file: /data/{{templateName}}{{guestId}}.qcow2
+    net:
+      - nic:
+        model: virtio
+        macaddr: "{{macAddress}}"
+      - bridge:
+        br: qemu0
+    chardev: null,id=id
+    serial: none
+    monitor: none
+    nographic:
+
+guests:
+  - template: standard
+    arch: aarch64
+    count: 1
