@@ -23,4 +23,5 @@ RUN mkdir -p /etc/qemu \
 	&& echo "allow all" > /etc/qemu/bridge.conf \
 	&& chmod 0640 /etc/qemu/bridge.conf
 
-CMD ./cli.js
+WORKDIR /data/
+CMD /root/cli.js
