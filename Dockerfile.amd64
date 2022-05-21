@@ -3,9 +3,7 @@ FROM alpine:3.15.0 AS base
 RUN apk add --update --no-cache \
 	nodejs~=16 \
 	qemu-img \
-	qemu-system-x86_64 \
-	  && rm -rf /usr/share/qemu/edk2* \
-	&& (apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.15/community ovmf || true)
+	qemu-system-x86_64
 
 WORKDIR /root
 
