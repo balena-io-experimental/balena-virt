@@ -6,9 +6,9 @@ Balena Virt is a suite of tools for virtualising Balena OS.
 
 There are a number of options for using Balena Virt:
 
-- Turning a single [Intel NUC](#balena-virt-on-intel-nuc) into a small fleet of devices for testing and development
-- Running on a [Digital Ocean Droplet](#balena-virt-on-digital-ocean), providing an easy way to try [Balena Cloud](https://www.balena.io/cloud/) without the need for physical hardware, and to provide a powerful development platform.
-- Using the [Balena Virt CLI](#balena-virt-cli) for custom builds
+1. Turning a single [Intel NUC](#balena-virt-on-intel-nuc) into a small fleet of devices for testing and development
+2. Running on a [Digital Ocean Droplet](#balena-virt-on-digital-ocean), providing an easy way to try [Balena Cloud](https://www.balena.io/cloud/) without the need for physical hardware, and to provide a powerful development platform
+3. Using the [Balena Virt CLI](#balena-virt-cli) for custom builds
 
 ## Balena Virt on Intel NUC
 
@@ -16,7 +16,7 @@ There are a number of options for using Balena Virt:
 
 Deploy Balena Virt with the one-click install to turn your NUC into 4 Balena OS devices:
 
-[![deploy button](https://balena.io/deploy.svg)](https://github.com/balena-labs-research/balena-virt)
+[![deploy button](https://balena.io/deploy.svg)](https://dashboard.balena-cloud.com/deploy?repoUrl=https://github.com/balena-labs-research/balena-virt)
 
 By default the cores, memory and disk will mirror your NUC. To set them manually, add environment variables:
 
@@ -76,7 +76,7 @@ balena push 127.0.0.1
 
 You can scale the Digital Ocean hardware to your development needs. 8 CPUs, 16GB of memory, and SSD drives make development (such as compiling binaries) far more efficient on Digital Ocean than on much of the IoT hardware used in production, while removing any need for manual configuration of development environments on your local system.
 
-You can see [some benchmarks](./vps/README.md#benchmarks) where we compared the performance of Balena Virt on a Droplets against some common hardware.
+You can see [some benchmarks](https://github.com/balena-labs-research/balena-virt/blob/main/vps/README.md#benchmarks) where we compared the performance of Balena Virt on a Droplets against some common hardware.
 
 ### Step 1: Sign up for Digital Ocean and claim the free credit
 
@@ -139,7 +139,7 @@ ssh -L 80:10.0.3.10:80 \
 
 ### Advanced Configuration
 
-Advanced documentation is available in the `vps` folder [here](vps/README.md).
+Advanced documentation is available in the `vps` folder [here](https://github.com/balena-labs-research/balena-virt/blob/main/vps/README.md).
 
 ## Balena Virt CLI
 
@@ -172,4 +172,4 @@ This disk image would then be available inside the container at `/data/rootfs.im
 
 ### Advanced Configuration
 
-Advanced documentation is available in the `cli` folder [here](cli/README.md).
+Advanced documentation is available in the `cli` folder [here](https://github.com/balena-labs-research/balena-virt/blob/main/cli/README.md).

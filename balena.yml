@@ -15,8 +15,6 @@ assets:
     data:
       url: 'https://raw.githubusercontent.com/balena-labs-research/balena-virt/main/logo.svg'
 data:
-  applicationEnvironmentVariables:
-    - GUEST_CONFIG_PATH: /data/guests.yml
   defaultDeviceType: generic-amd64
   supportedDeviceTypes:
     - generic-amd64
