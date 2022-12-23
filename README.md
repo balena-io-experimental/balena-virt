@@ -1,28 +1,168 @@
-# balenaVirt
-Easily run virtual machines on balenaOS with native performance, powered by QEMU and KVM. Guests can even run balenaOS on balenaOS, allowing multiple containerized applications to run concurrently on one physical device.
+<img src="https://raw.githubusercontent.com/balena-labs-research/balena-virt/logo.svg" alt="Labs Logo" title="Labs Logo" width="50"/>
 
-Additionally, this allows balenaOS guests can take advantage of QEMU features such as shared backing images and disk [snapshots](https://wiki.qemu.org/Documentation/CreateSnapshot) via qcow2 images, rolling back to a previous snapshot, temporary snapshots, [pause and resume](https://qemu-project.gitlab.io/qemu/system/images.html#vm-005fsnapshots), and [live migration](https://developers.redhat.com/blog/2015/03/24/live-migrating-qemu-kvm-virtual-machines) to another host.
+# Balena Virt
 
-# Caveats
+Balena Virt is a suite of tools for virtualising Balena OS.
 
-Because instances are virtualized, applications on separate guests must communicate between each other over the network, rather than using UNIX domain sockets or shared memory. Hardware access will typically require an IOMMU and VFIO passthrough to work, which is traditionally only supported on PCs. Your mileage may vary. This approach is most useful for running multiple services on the same physical machine, which don't require anything more than network access.
+There are a number of options for using Balena Virt:
 
-## Installation and Usage
+- Turning a single [Intel NUC](#balena-virt-on-intel-nuc) into a small fleet of devices for testing and development
+- Running on a [Digital Ocean Droplet](#balena-virt-on-digital-ocean), providing an easy way to try [Balena Cloud](https://www.balena.io/cloud/) without the need for physical hardware, and to provide a powerful development platform.
+- Using the [Balena Virt CLI](#balena-virt-cli) for custom builds
 
-### BalenaOS
-Deploy with `balena push`
+## Balena Virt on Intel NUC
+
+[Install Balena OS on your NUC](https://www.balena.io/docs/learn/getting-started/intel-nuc/nodejs/#provision-device) using the `generic-amd64` image.
+
+Deploy Balena Virt with the one-click install to turn your NUC into 4 Balena OS devices:
+
+[![deploy button](https://balena.io/deploy.svg)](https://github.com/balena-labs-research/balena-virt)
+
+By default the cores, memory and disk will mirror your NUC. To set them manually, add environment variables:
+
+```
+CORES=4
+DISK=8G
+MEM=512M
+```
+
+Change the default number of devices by adding or removing containers from the `./docker-compose.yml` file and deploying manually with `balena push`.
+
+### Accessing the devices
+
+Each device will be assigned its own IP and is accessible when you SSH to the Intel NUC.
+
+Alternatively, you can use [Tailscale](http://tailscale.com) to expose all the running devices to your local system as if they are on your network. On the Intel NUC run the Tailscale container:
+
+```
+balena run -d \
+    --name=tailscaled \
+    --restart always \
+    -e TS_STATE_DIR=/var/lib/tailscale \
+    -v tailscale-state:/var/lib/tailscale \
+    -v /dev/net/tun:/dev/net/tun \
+    --network=host \
+    --privileged \
+    tailscale/tailscale tailscaled --advertise-routes=10.0.3.0/24 --accept-routes
+```
+
+Then bring up the service with:
+
+```
+balena exec tailscaled tailscale up
+```
+
+The Tailscale container will provide you a URL to access that adds the device to your Tailscale account.
+
+Then [enable the subnets](https://tailscale.com/kb/1019/subnets/#step-3-enable-subnet-routes-from-the-admin-console) from your Tailscale admin panel to be able to use all the devices locally through the IP addresses they are assigned by Balena Virt.
+
+If you would rather not use Tailscale, you can use SSH to forward a virtualised device to a port on your local system:
+
+```
+ssh -L 22222:10.0.3.10:22222 \
+ -L 2375:10.0.3.10:2375 \
+ -L 48484:10.0.3.10:48484 \
+ root@ip.ip.ip.ip
+```
+
+## Balena Virt on Digital Ocean
+
+Balena Virt can be run on a Digital Ocean droplet with hardware acceleration. This guide provides a link for $200 of free Digital Ocean credit; an installation script; and steps to forward the ports locally. After installation, you will be able to use virtualised OS locally just like any other device, using the Balena tools, e.g:
+
+```
+balena ssh 127.0.0.1
+balena push 127.0.0.1
+```
+
+You can scale the Digital Ocean hardware to your development needs. 8 CPUs, 16GB of memory, and SSD drives make development (such as compiling binaries) far more efficient on Digital Ocean than on much of the IoT hardware used in production, while removing any need for manual configuration of development environments on your local system.
+
+You can see [some benchmarks](./vps/README.md#benchmarks) where we compared the performance of Balena Virt on a Droplets against some common hardware.
+
+### Step 1: Sign up for Digital Ocean and claim the free credit
+
+Sign up for Digital Ocean. Using the button below you will get $200 of free credit for 60 days; plenty to run a powerful virtual device:
+
+<a href="https://www.digitalocean.com/?refcode=c1582aebbcdf&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge"><img src="https://web-platforms.sfo2.digitaloceanspaces.com/WWW/Badge%202.svg" alt="DigitalOcean Referral Badge" /></a>
+
+You will see a banner at the top of the page indicating that the credit is active and you can continue to the sign up page:
+
+`Free credit active: Get started on DigitalOcean with a $200, 60-day credit for new users.`
+
+### Step 2: Create a droplet.
+
+The [Digital Ocean documentation](https://docs.digitalocean.com/products/droplets/how-to/create/#create-a-droplet-in-the-control-panel) provides guidance on how if you need some helps.
+
+We suggest a minimum of 2GB of RAM. Although as your free credit only lasts 60 days, why not fire up a more powerful machine (don't forget to `destroy` the machine before your 2 months runs out):
+
+```
+8 CPUs
+16 GB Memory
+320 GB SSD Disk
+6 TB transfer
+$96 /mo
+```
+
+### Step 3: Run the install script
+
+Connect to your Droplet as the `root` user via the terminal and run the install script:
+
+```
+curl -fsSL https://raw.githubusercontent.com/balena-labs-research/balena-virt/main/vps/install.sh | sudo sh
+```
+
+The default number cores, disk size and memory of the virtualised device will mirror the system that Balena Virt is running on.
+
+### Step 4: Forward the Droplet ports to your local system
+
+Mount the running virtualised OS locally with the following, where `ip.ip.ip.ip` is the IP address of your remote host (for example your DigitalOcean Droplet IP):
+
+```
+ssh -L 22222:10.0.3.10:22222 \
+ -L 2375:10.0.3.10:2375 \
+ -L 48484:10.0.3.10:48484 \
+ root@ip.ip.ip.ip
+```
+
+You can then use the Balena CLI to interact with the OS by using the local IP address, for example:
+
+```
+balena ssh 127.0.0.1
+balena push 127.0.0.1
+```
+
+Other ports can me mapped locally, for example to interact with services on the device:
+
+```
+ssh -L 80:10.0.3.10:80 \
+ root@ip.ip.ip.ip
+```
+
+### Advanced Configuration
+
+Advanced documentation is available in the `vps` folder [here](vps/README.md).
+
+## Balena Virt CLI
+
+Easily run virtual machines on balenaOS with native performance, powered by QEMU and KVM. Guests can even run balenaOS on balenaOS, allowing multiple containerized applications to run concurrently on one physical hardware device.
+
+Additionally, this allows balenaOS guests to take advantage of QEMU features such as shared backing images and disk [snapshots](https://wiki.qemu.org/Documentation/CreateSnapshot) via qcow2 images, rolling back to a previous snapshot, temporary snapshots, [pause and resume](https://qemu-project.gitlab.io/qemu/system/images.html#vm-005fsnapshots), and [live migration](https://developers.redhat.com/blog/2015/03/24/live-migrating-qemu-kvm-virtual-machines) to another host.
+
+Deploy with `balena push` from the `./cli` directory.
 
 Grab a balenaOS image for your guest(s) using the dashboard, or CLI:
+
 ```
 $ balena os download genericx86-64-ext -o rootfs.img
 ```
 
 Images and configs can be copied to the named data volume for the application using SCP, assuming you have SSH access:
+
 ```
 $ scp -P 22222 rootfs.img root@mydevice.local:/var/lib/docker/volumes/${appid}_resin-data/_data/
 ```
 
 The config can be edited on your device from the dashboard inside the `main` container, or using SSH:
+
 ```
 $ balena ssh mydevice.local main
 ~ # vi /data/guests.yml
@@ -30,109 +170,6 @@ $ balena ssh mydevice.local main
 
 This disk image would then be available inside the container at `/data/rootfs.img`.
 
-### Development
-Install dependencies using `npm i`, then run with `node cli.js`
+### Advanced Configuration
 
-Additional dependencies are QEMU, and optionally OVMF/AAVMF firmware for UEFI support.
-
-## Configuration
-
-Guests are defined using a `guests.yml` YAML config.  By default, the application looks for this file in the current directory, but the path can be specified as the environment variable `GUEST_CONFIG_PATH`. The `templates` array specifies machine configuration templates that can be used to launch fleets. Template variables correlate directly to QEMU command line arguments for the most part, with few exceptions. Notably, the `append` array can be used to add arguments to the command line directly.
-
-Variable substitution is also supported in templates, using double curly brace (`{{var}}`) syntax. For example, the `guestId` variable can be substituted in strings, to identify machine specific resources, such as disk images, and logs.
-
-The `guests` array specifies which templates to use, and how many instances to launch per template.
-
-See the `examples/` directory for details.
-
-### Template Variables
-| Variable       | Description                                             |
-| -------------- | ------------------------------------------------------- |
-| `guestId`      | Unique numeric identifier for each guest within a fleet |
-| `macAddress`   | Unique generated MAC for each guest                     |
-| `templateName` | Name of the template used to create the fleet           |
-
-### Disks
-As mentioned above, templates support variable substitution for identifying resources that aren't shared between machines. For example, a a disk can be specified like so:
-```yaml
-drive:
-  - if: virtio
-    format: raw
-    file: /data/guest{{guestId}}.img
-    index: 0
-    media: disk
-```
-
-A fleet of five devices would then require `guest0.img` through `guest4.img` to be present.
-
-It should be noted that raw images lack many features of other image formats, such as qcow2. We can use a qcow2 image as a backing store, and have our instances write to copy-on-write (CoW) snapshots to save disk space.
-
-A raw image can be converted to qcow2 like so:
-`qemu-img convert -f raw -O qcow2 rootfs.img rootfs.qcow2`
-
-After converting our raw image to qcow2, we can create additional CoW snapshot images using the original as a backing store:
-
-```bash
-$ for i in {0..4}; do \
-qemu-img create -f qcow2 -F qcow2 -b rootfs.qcow2 guest${i}.qcow2 32G \
-done
-```
-
-These CoW snapshots can now be used directly by guests:
-```yaml
-drive:
-  - if: virtio
-    format: qcow2
-    file: /data/guest{{guestId}}.qcow2
-    index: 0
-    media: disk
-```
-
-If you want to resize an image after it's created, you can do this from the host OS CLI as well. Make sure to power off the guest before attempting to resize the disk:
-```
-$ balena run -it -v ${appid}_resin-data:/mnt alpine \
-  apk add --update qemu-img \
-  && qemu-img resize /mnt/guest0.qcow2 64G
-```
-
-## Networking
-### Shared physical device
-First, create a bridge, and assign the physical interface as a slave. This can be done on the host OS using nmcli:
-
-```
-$ nmcli connection add type bridge ifname qemu0
-$ nmcli connection add type bridge-slave ifname eno1 master qemu0
-```
-
-The changes will take affect after rebooting. Upon reconnecting to the device, you should see the physical interface with no address, and the bridge will now have an address.
-
-You can connect your guest to the bridge using the following QEMU options:
-```
--net nic,model=virtio -net bridge,br=qemu0
-```
-
-This is formatted in the template in the `guests.yaml` file like so:
-```
-net:
-  - nic:
-    model: virtio
-  - bridge:
-    br: qemu0
-```
-
-You may need to allow forwarding from this bridge:
-```
-$ iptables -I FORWARD -i qemu0 -j ACCEPT
-$ iptables -I FORWARD -o qemu0 -j ACCEPT
-```
-
-## Tips and Tricks
-### Get guest `cmdline` from MAC address
-At times, you may want to act on a specific guest, such as resizing the disk image, or other management tasks. In order to do this, you need to get the command line used to launch that specific guest, to figure out what the variables from the template were populated with.
-
-One way to do this is to get the MAC address of the guest, either from the dashboard or SSH, then grep `/proc` for that MAC.
-
-From the host OS of the hypervisor:
-```
-$ cat $(grep -ir "${mac_address}" /proc/*/cmdline | head -1 | cut -d: -f1) | tr '\000' ' '
-```
+Advanced documentation is available in the `cli` folder [here](cli/README.md).
