@@ -1,0 +1,23 @@
+version: "2"
+
+services:
+  networking:
+    image: ghcr.io/balena-labs-research/balena-virt-networking:latest
+    cap_add:
+      - net_admin
+    network_mode: host
+    restart: always
+
+  balena-virt:
+    image: ghcr.io/balena-labs-research/balena-virt:latest
+    volumes:
+      - bv_pid:/app/pid
+    cap_add:
+      - net_admin
+    devices:
+      - /dev/kvm
+    network_mode: host
+    restart: always
+
+volumes:
+  bv_pid:

@@ -1,0 +1,68 @@
+# Compose file for starting multiple virtulised devices
+version: "2"
+
+services:
+  balena-virt-networking:
+    image: ghcr.io/balena-labs-research/balena-virt-networking:latest
+    cap_add:
+      - net_admin
+    network_mode: host
+    restart: always
+
+  balena-virt-1:
+    image: ghcr.io/balena-labs-research/balena-virt:latest
+    volumes:
+      - bv_pid:/app/pid
+    cap_add:
+      - net_admin
+    devices:
+      - /dev/kvm
+    network_mode: host
+    depends_on:
+      - "balena-virt-networking"
+    restart: always
+
+  balena-virt-2:
+    image: ghcr.io/balena-labs-research/balena-virt:latest
+    volumes:
+      - bv_pid:/app/pid
+    cap_add:
+      - net_admin
+    devices:
+      - /dev/kvm
+    network_mode: host
+    depends_on:
+      - "balena-virt-1"
+      - "balena-virt-networking"
+    restart: always
+
+  balena-virt-3:
+    image: ghcr.io/balena-labs-research/balena-virt:latest
+    volumes:
+      - bv_pid:/app/pid
+    cap_add:
+      - net_admin
+    devices:
+      - /dev/kvm
+    network_mode: host
+    depends_on:
+      - "balena-virt-1"
+      - "balena-virt-networking"
+    restart: always
+
+  balena-virt-4:
+    image: ghcr.io/balena-labs-research/balena-virt:latest
+    volumes:
+      - bv_pid:/app/pid
+    cap_add:
+      - net_admin
+    devices:
+      - /dev/kvm
+    network_mode: host
+    depends_on:
+      - "balena-virt-1"
+      - "balena-virt-networking"
+    restart: always
+
+volumes:
+  bv_pid:

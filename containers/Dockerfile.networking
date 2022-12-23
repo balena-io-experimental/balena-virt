@@ -1,0 +1,19 @@
+FROM ubuntu:20.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Etc/UTC
+
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    dnsmasq \
+    socat && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY dnsmasq.conf .
+COPY networking-start.sh start.sh
+
+RUN chmod +x start.sh
+
+CMD ["/app/start.sh"]

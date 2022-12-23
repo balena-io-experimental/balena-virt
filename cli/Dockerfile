@@ -3,6 +3,7 @@ FROM alpine:3.15.0@sha256:c74f1b1166784193ea6c8f9440263b9be6cae07dfe35e32a5df7a3
 RUN apk add --update --no-cache \
 	nodejs~=16 \
 	qemu-img \
+	qemu-system-x86_64 \
 	qemu-system-aarch64 \
 	qemu-system-arm
 
@@ -10,6 +11,7 @@ WORKDIR /root
 
 FROM base AS build
 
+# install npm in a separate build stage to save space in the runtime image
 RUN apk add --update --no-cache npm
 
 COPY package.json *.js ./
@@ -19,6 +21,8 @@ FROM base AS run
 
 COPY --from=build /root/ /root/
 
+# create qemu-bridge-helper ACL file
+# https://wiki.qemu.org/Features/HelperNetworking
 RUN mkdir -p /etc/qemu \
 	&& echo "allow all" > /etc/qemu/bridge.conf \
 	&& chmod 0640 /etc/qemu/bridge.conf
