@@ -7,8 +7,9 @@ Balena Virt is a suite of tools for virtualising Balena OS.
 There are a number of options for using Balena Virt:
 
 1. Turning a single [Intel NUC](#balena-virt-on-intel-nuc) into a small fleet of devices for testing and development
-2. Running on a [Digital Ocean Droplet](#balena-virt-on-digital-ocean), providing an easy way to try [Balena Cloud](https://www.balena.io/cloud/) without the need for physical hardware, and to provide a powerful development platform
-3. Using the [Balena Virt CLI](#balena-virt-cli) for custom builds
+2. Running on a [Digital Ocean Droplet](#balena-virt-on-digital-ocean), providing an easy way to try [Balena Cloud](https://www.balena.io/cloud/) without the need for physical hardware, and to provide a powerful development platform.
+4. Running on other VPS services and hardware. See the [advanced setup](https://github.com/balena-labs-research/balena-virt/blob/main/vps/README.md) which provides containers that can be used and steps for using Tailscale for multi-device setups. 
+4. Using the [Balena Virt CLI](#balena-virt-cli) for custom builds
 
 ## Balena Virt on Intel NUC
 
@@ -139,7 +140,7 @@ ssh -L 80:10.0.3.10:80 \
 
 ### Advanced Configuration
 
-Advanced documentation is available in the `vps` folder [here](https://github.com/balena-labs-research/balena-virt/blob/main/vps/README.md).
+Advanced documentation is available in the `vps` folder [here](https://github.com/balena-labs-research/balena-virt/blob/main/vps/README.md). It includes instructions on using other VPS services, and enabling Tailscale for multiple devices on each service. 
 
 ## Balena Virt CLI
 
