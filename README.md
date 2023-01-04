@@ -35,7 +35,7 @@ Each device will be assigned its own IP and is accessible when you SSH to the In
 
 Alternatively, you can use [Tailscale](http://tailscale.com) to expose all the running devices to your local system as if they are on your network. On the Intel NUC run the Tailscale container:
 
-```
+```bash
 balena run -d \
     --name=tailscaled \
     --restart always \
@@ -44,13 +44,13 @@ balena run -d \
     -v /dev/net/tun:/dev/net/tun \
     --network=host \
     --privileged \
-    tailscale/tailscale tailscaled --advertise-routes=10.0.3.0/24 --accept-routes
+    tailscale/tailscale tailscaled
 ```
 
 Then bring up the service with:
 
-```
-balena exec tailscaled tailscale up
+```bash
+balena exec tailscaled tailscale up --advertise-routes=10.0.3.0/24 --accept-routes --reset
 ```
 
 The Tailscale container will provide you a URL to access that adds the device to your Tailscale account.
@@ -59,7 +59,7 @@ Then [enable the subnets](https://tailscale.com/kb/1019/subnets/#step-3-enable-s
 
 If you would rather not use Tailscale, you can use SSH to forward a virtualised device to a port on your local system:
 
-```
+```bash
 ssh -L 22222:10.0.3.10:22222 \
  -L 2375:10.0.3.10:2375 \
  -L 48484:10.0.3.10:48484 \
