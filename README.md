@@ -8,22 +8,32 @@ There are a number of options for using Balena Virt:
 
 1. Running on a [Digital Ocean Droplet](#balena-virt-on-digital-ocean), providing an easy way to try [Balena Cloud](https://www.balena.io/cloud/) without the need for physical hardware, and to provide a powerful development platform.
 2. Running on other VPS services and hardware. See the [advanced setup](https://github.com/balena-labs-research/balena-virt/blob/main/vps/README.md) which provides containers that can be used and steps for using Tailscale for multi-device setups.
-3. Turning a single [Intel NUC](#balena-virt-on-intel-nuc) into a small fleet of devices for testing and development
-4. Using the [Balena Virt CLI](#balena-virt-cli) for custom builds
+3. Running locally on a Linux desktop machine
+4. Turning a single [Intel NUC](#balena-virt-on-intel-nuc) into a small fleet of devices for testing and development
+5. Using the [Balena Virt CLI](#balena-virt-cli) for custom builds
 
 ## Universal Environment Variables
 
-Default cores, disk size and memory will mirror the system that balenaVirt is running on.
-
-The default OS to run is the latest `GENERIC X86_64 (GPT)` images.
+### Joining a fleet automatically
 
 Images can be configured to automatically join the balenaCloud by passing the `API_TOKEN` environment variable and `FLEET` environment variable. When passing these variables, the device will default to production mode, unless also passing in the `DEV_MODE` environment variable.
+
+```bash
+API_TOKEN="sdfef2fef123"
+FLEET="your-fleet"
+DEV_MODE=true # Defaults to true when not configured for joining th Cloud, defaults to false when joining the Cloud
+```
+
+### Configuring the environment
+
+Default cores, disk size and memory will mirror the system that balenaVirt is running on.
+
+The default OS image is the latest `GENERIC X86_64 (GPT)` images.
 
 These defaults can be overridden with environment variables. Here are some examples:
 
 ```bash
-IMAGE_VERSION=2.108.28+rev3 # Default image is GENERIC X86_64 (GPT)
-DEV_MODE=true # Defaults to true when not configured for joining th Cloud, defaults to false when joining the Cloud
+IMAGE_VERSION=2.108.28+rev3 # Image type is always GENERIC X86_64 (GPT)
 CORES=4
 DISK=8G
 MEM=512M
@@ -104,6 +114,34 @@ ssh -L 80:10.0.3.10:80 \
 ### Advanced Configuration
 
 Advanced documentation is available in the `vps` folder [here](https://github.com/balena-labs-research/balena-virt/blob/main/vps/README.md). It includes instructions on using other VPS services, and enabling Tailscale for multiple devices on each service.
+
+## Balena Virt on Linux Desktop
+
+Are you running Linux on your desktop? You can start a virtual device on your desktop with the following Docker run commands:
+
+Start the networking requirements:
+
+```
+docker run -it \
+    --restart always \
+    --cap-add=net_admin \
+    --network host \
+    ghcr.io/balena-labs-research/balena-virt-networking:latest
+```
+
+Start the virtualised OS:
+
+```
+docker run -it \
+    --restart always \
+    -v bv_pid:/app/pid \
+    --device=/dev/kvm \
+    --cap-add=net_admin \
+    --network host \
+    ghcr.io/balena-labs-research/balena-virt:latest
+```
+
+Start additional devices by running the `ghcr.io/balena-labs-research/balena-virt:latest` command again.
 
 ## Balena Virt on Intel NUC
 
