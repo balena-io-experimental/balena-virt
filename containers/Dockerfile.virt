@@ -1,20 +1,3 @@
-FROM ubuntu:20.04 AS extract-image
-
-ARG IMAGE_URL="https://github.com/maggie0002/op-brave-potato/releases/download/0.0.3/generic_amd64_2.108.0.qcow2.zip"
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    ca-certificates \
-    unzip \
-    wget && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN wget -O balena-image.zip $IMAGE_URL && \
-    unzip balena-image.zip && \
-    mv -n *.qcow2 balena-source.qcow2 && \
-    rm balena-image.zip
-
-
 FROM ubuntu:20.04
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -27,10 +10,11 @@ RUN apt-get update && \
     ca-certificates \
     ovmf \
     qemu-system-x86 \
-    qemu-utils && \
+    qemu-utils \
+    unzip \
+    wget && \
     rm -rf /var/lib/apt/lists/*
 
-COPY --from=extract-image balena-source.qcow2 .
 COPY virt-start.sh start.sh
 
 RUN chmod +x start.sh
