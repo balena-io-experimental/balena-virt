@@ -6,64 +6,27 @@ Balena Virt is a suite of tools for virtualising Balena OS.
 
 There are a number of options for using Balena Virt:
 
-1. Turning a single [Intel NUC](#balena-virt-on-intel-nuc) into a small fleet of devices for testing and development
-2. Running on a [Digital Ocean Droplet](#balena-virt-on-digital-ocean), providing an easy way to try [Balena Cloud](https://www.balena.io/cloud/) without the need for physical hardware, and to provide a powerful development platform.
-4. Running on other VPS services and hardware. See the [advanced setup](https://github.com/balena-labs-research/balena-virt/blob/main/vps/README.md) which provides containers that can be used and steps for using Tailscale for multi-device setups. 
+1. Running on a [Digital Ocean Droplet](#balena-virt-on-digital-ocean), providing an easy way to try [Balena Cloud](https://www.balena.io/cloud/) without the need for physical hardware, and to provide a powerful development platform.
+2. Running on other VPS services and hardware. See the [advanced setup](https://github.com/balena-labs-research/balena-virt/blob/main/vps/README.md) which provides containers that can be used and steps for using Tailscale for multi-device setups.
+3. Turning a single [Intel NUC](#balena-virt-on-intel-nuc) into a small fleet of devices for testing and development
 4. Using the [Balena Virt CLI](#balena-virt-cli) for custom builds
 
-## Balena Virt on Intel NUC
+## Universal Environment Variables
 
-[Install Balena OS on your NUC](https://www.balena.io/docs/learn/getting-started/intel-nuc/nodejs/#provision-device) using the `generic-amd64` image.
+Default cores, disk size and memory will mirror the system that balenaVirt is running on.
 
-Deploy Balena Virt with the one-click install to turn your NUC into 4 Balena OS devices:
+The default OS to run is the latest `GENERIC X86_64 (GPT)` images.
 
-[![deploy button](https://balena.io/deploy.svg)](https://dashboard.balena-cloud.com/deploy?repoUrl=https://github.com/balena-labs-research/balena-virt)
+Images can be configured to automatically join the balenaCloud by passing the `API_TOKEN` environment variable and `FLEET` environment variable. When passing these variables, the device will default to production mode, unless also passing in the `DEV_MODE` environment variable.
 
-By default the cores, memory and disk will mirror your NUC. To set them manually, add environment variables:
+These defaults can be overridden with environment variables. Here are some examples:
 
-```
+```bash
+IMAGE_VERSION=2.108.28+rev3 # Default image is GENERIC X86_64 (GPT)
+DEV_MODE=true # Defaults to true when not configured for joining th Cloud, defaults to false when joining the Cloud
 CORES=4
 DISK=8G
 MEM=512M
-```
-
-Change the default number of devices by adding or removing containers from the `./docker-compose.yml` file and deploying manually with `balena push`.
-
-### Accessing the devices
-
-Each device will be assigned its own IP and is accessible when you SSH to the Intel NUC.
-
-Alternatively, you can use [Tailscale](http://tailscale.com) to expose all the running devices to your local system as if they are on your network. On the Intel NUC run the Tailscale container:
-
-```bash
-balena run -d \
-    --name=tailscaled \
-    --restart always \
-    -e TS_STATE_DIR=/var/lib/tailscale \
-    -v tailscale-state:/var/lib/tailscale \
-    -v /dev/net/tun:/dev/net/tun \
-    --network=host \
-    --privileged \
-    tailscale/tailscale tailscaled
-```
-
-Then bring up the service with:
-
-```bash
-balena exec tailscaled tailscale up --advertise-routes=10.0.3.0/24 --accept-routes --reset
-```
-
-The Tailscale container will provide you a URL to access that adds the device to your Tailscale account.
-
-Then [enable the subnets](https://tailscale.com/kb/1019/subnets/#step-3-enable-subnet-routes-from-the-admin-console) from your Tailscale admin panel to be able to use all the devices locally through the IP addresses they are assigned by Balena Virt.
-
-If you would rather not use Tailscale, you can use SSH to forward a virtualised device to a port on your local system:
-
-```bash
-ssh -L 22222:10.0.3.10:22222 \
- -L 2375:10.0.3.10:2375 \
- -L 48484:10.0.3.10:48484 \
- root@ip.ip.ip.ip
 ```
 
 ## Balena Virt on Digital Ocean
@@ -140,7 +103,54 @@ ssh -L 80:10.0.3.10:80 \
 
 ### Advanced Configuration
 
-Advanced documentation is available in the `vps` folder [here](https://github.com/balena-labs-research/balena-virt/blob/main/vps/README.md). It includes instructions on using other VPS services, and enabling Tailscale for multiple devices on each service. 
+Advanced documentation is available in the `vps` folder [here](https://github.com/balena-labs-research/balena-virt/blob/main/vps/README.md). It includes instructions on using other VPS services, and enabling Tailscale for multiple devices on each service.
+
+## Balena Virt on Intel NUC
+
+[Install Balena OS on your NUC](https://www.balena.io/docs/learn/getting-started/intel-nuc/nodejs/#provision-device) using the `generic-amd64` image.
+
+Deploy Balena Virt with the one-click install to turn your NUC into 4 Balena OS devices:
+
+[![deploy button](https://balena.io/deploy.svg)](https://dashboard.balena-cloud.com/deploy?repoUrl=https://github.com/balena-labs-research/balena-virt)
+
+Change the default number of devices by adding or removing containers from the `./docker-compose.yml` file and deploying manually with `balena push`.
+
+### Accessing the devices
+
+Each device will be assigned its own IP and is accessible when you SSH to the Intel NUC.
+
+Alternatively, you can use [Tailscale](http://tailscale.com) to expose all the running devices to your local system as if they are on your network. On the Intel NUC run the Tailscale container:
+
+```bash
+balena run -d \
+    --name=tailscaled \
+    --restart always \
+    -e TS_STATE_DIR=/var/lib/tailscale \
+    -v tailscale-state:/var/lib/tailscale \
+    -v /dev/net/tun:/dev/net/tun \
+    --network=host \
+    --privileged \
+    tailscale/tailscale tailscaled
+```
+
+Then bring up the service with:
+
+```bash
+balena exec tailscaled tailscale up --advertise-routes=10.0.3.0/24 --accept-routes --reset
+```
+
+The Tailscale container will provide you a URL to access that adds the device to your Tailscale account.
+
+Then [enable the subnets](https://tailscale.com/kb/1019/subnets/#step-3-enable-subnet-routes-from-the-admin-console) from your Tailscale admin panel to be able to use all the devices locally through the IP addresses they are assigned by Balena Virt.
+
+If you would rather not use Tailscale, you can use SSH to forward a virtualised device to a port on your local system:
+
+```bash
+ssh -L 22222:10.0.3.10:22222 \
+ -L 2375:10.0.3.10:2375 \
+ -L 48484:10.0.3.10:48484 \
+ root@ip.ip.ip.ip
+```
 
 ## Balena Virt CLI
 
