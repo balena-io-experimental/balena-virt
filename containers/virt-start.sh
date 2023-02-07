@@ -1,7 +1,24 @@
 #!/usr/bin/env bash
+set -e
+
 IMAGE_PATH="https://api.balena-cloud.com/download?deviceType=generic-amd64&fileType=.zip&developmentMode=true&imageType=raw&version="
 PID_FILE="/app/pid/first.pid"
 RANDOM_PORT=$((RANDOM % 9999))
+
+cloud_login () {
+    if ! balena login --token "$API_TOKEN" ; then
+        echo "Failed to login to balenaCloud with the API token provided."
+        exit 1
+    fi
+}
+
+configure_image () {
+    cloud_login
+    if ! balena os configure balena.img --config-network ethernet --fleet "$FLEET" $DEV_FLAGS ; then
+        echo "Failed to configure image with the fleet provided."
+        exit 1
+    fi
+}
 
 # If this is the first device started, use a MAC address to set a default IP
 if ! test -f "$PID_FILE"; then
@@ -18,6 +35,12 @@ fi
 if ! ls /dev/kvm &> /dev/null; then
     echo "KVM hardware acceleration unavailable. Pass --device /dev/kvm in your Docker run command."
     exit 1
+fi
+
+# If DEV_MODE is provided, configure the image for development mode, enabling SSH access 
+if [ -n "$DEV_MODE" ]; then
+    DEV_FLAGS="--dev"
+    echo Development image mode enabled
 fi
 
 # If no default OS version is specified, use the latest version
@@ -48,8 +71,16 @@ fi
 if [ ! -f balena.qcow2 ]; then
     echo "Downloading balenaOS image..."
     wget -q -O balena-image.zip "$IMAGE_PATH$IMAGE_VERSION" && \
-    unzip balena-image.zip && \
+    unzip -o balena-image.zip && \
     mv ./*.img balena.img && \
+
+    # If an API token and fleet is provided, configure the image to join the fleet
+    if [ -n "$API_TOKEN" ] && [ -n "$FLEET" ]; then
+        echo "Configuring image with fleet configuration..."
+        configure_image
+        echo "Finished configuring image."
+    fi
+
     qemu-img convert -f raw -O qcow2 balena.img balena-source.qcow2 && \
     qemu-img create -f qcow2 -F qcow2 -b balena-source.qcow2 balena.qcow2 "$DISK" && \
     rm balena.img balena-image.zip

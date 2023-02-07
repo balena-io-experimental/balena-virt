@@ -3,8 +3,6 @@ FROM ubuntu:20.04
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
-WORKDIR /app
-
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -14,6 +12,14 @@ RUN apt-get update && \
     unzip \
     wget && \
     rm -rf /var/lib/apt/lists/*
+
+ARG BALENA_CLI_VERSION=v15.0.3
+ENV PATH /app/balena-cli:$PATH
+WORKDIR /app
+
+# Install balena-cli via standlone zip to allow configuring of images
+RUN wget -q -O balena-cli.zip "https://github.com/balena-io/balena-cli/releases/download/${BALENA_CLI_VERSION}/balena-cli-${BALENA_CLI_VERSION}-linux-x64-standalone.zip" && \
+    unzip balena-cli.zip && rm balena-cli.zip
 
 COPY virt-start.sh start.sh
 
