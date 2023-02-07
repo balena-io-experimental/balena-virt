@@ -6,12 +6,27 @@ For basic installation see the repo [README](../README.md).
 
 ### Manually start the containers
 
-```
 # Start the networking requirements
-docker run -it --restart always --cap-add=net_admin --network host ghcr.io/balena-labs-research/balena-virt-networking:latest
 
-# Start the virtualised OS
-docker run -it --restart always -v bv_pid:/app/pid --device=/dev/kvm --cap-add=net_admin --network host ghcr.io/balena-labs-research/balena-virt:latest
+```
+docker run -it \
+    --restart always \
+    --cap-add=net_admin \
+    --network host \
+    ghcr.io/balena-labs-research/balena-virt-networking:latest
+```
+
+Start the virtual OS
+
+```
+docker run -it \
+ --restart always \
+ -v bv_pid:/app/pid \
+ --device=/dev/kvm \
+ --cap-add=net_admin \
+ --network host \
+ ghcr.io/balena-labs-research/balena-virt:latest
+
 ```
 
 ### Start additional virtualised OS on the same host
@@ -19,23 +34,54 @@ docker run -it --restart always -v bv_pid:/app/pid --device=/dev/kvm --cap-add=n
 After starting the `networking` container in the previous step, you can start additional instances by running the container command again:
 
 ```
+
 docker run -it --restart always -v bv_pid:/app/pid --device=/dev/kvm --cap-add=net_admin --network host ghcr.io/balena-labs-research/balena-virt:latest
+
 ```
 
 The second instance will be assigned a random IP address to avoid overlap with the first instance.
+
+### Join a balenaCloud fleet on launch
+
+Images can be configured to automatically join the balenaCloud by passing the `API_TOKEN` environment variable and `FLEET` environment variable. When passing these variables, the device will default to production mode, unless also passing in the `DEV_MODE` environment variable.
+
+```
+
+docker run -it \
+ -e API_TOKEN="sdfef2fef123" \
+ -e FLEET="your-fleet" \
+ -e DEV_MODE=true \
+ -e API_TOKEN="sdfef2fef123" \
+ --restart always \
+ -v bv_pid:/app/pid \
+ --device=/dev/kvm \
+ --cap-add=net_admin \
+ --network host \
+ ghcr.io/balena-labs-research/balena-virt:latest
+
+```
 
 ### Manually configure the disk size, memory and number of cores
 
 Default cores, disk size and memory will mirror the system that it is running on (using available memory to avoid out of memory errors). Override the automatic configuration by passing environment variables during the Docker run process, for example to set the disk size:
 
 ```
-docker run -it -e "DISK=32G" --restart always -v bv_pid:/app/pid --device=/dev/kvm --cap-add=net_admin --network host ghcr.io/balena-labs-research/balena-virt:latest
+
+docker run -it \
+ -e "DISK=32G" \
+ --restart always \
+ -v bv_pid:/app/pid \
+ --device=/dev/kvm \
+ --cap-add=net_admin \
+ --network host \
+ ghcr.io/balena-labs-research/balena-virt:latest
+
 ```
 
 Available environment variables with examples:
 
 ```bash
-# Default image is GENERIC X86_64 (GPT)
+# Image type is always GENERIC X86_64 (GPT)
 IMAGE_VERSION=2.108.28+rev3
 CORES=4
 DISK=8G
