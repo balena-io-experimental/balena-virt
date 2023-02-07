@@ -34,7 +34,9 @@ docker run -it -e "DISK=32G" --restart always -v bv_pid:/app/pid --device=/dev/k
 
 Available environment variables with examples:
 
-```
+```bash
+# Default image is GENERIC X86_64 (GPT)
+IMAGE_VERSION=2.108.28+rev3
 CORES=4
 DISK=8G
 MEM=512M

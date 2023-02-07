@@ -1,5 +1,3 @@
-# Install script tested on DigitalOcean Droplets
-
 #!/usr/bin/env bash
 COMPOSE_URL="https://raw.githubusercontent.com/balena-labs-research/balena-virt/main/vps/docker-compose.yml"
 
