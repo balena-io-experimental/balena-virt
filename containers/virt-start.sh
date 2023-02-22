@@ -69,11 +69,20 @@ fi
 
 # If image is not yet generated then create based on available disk space
 if [ ! -f balena.qcow2 ]; then
-    echo "Downloading balenaOS image..."
-    wget -q -O balena-image.zip "$IMAGE_PATH$IMAGE_VERSION" && \
-    unzip -o balena-image.zip && \
-    mv ./*.img balena.img && \
 
+    # If image is given through a volume, use that instead of downloading one
+    if [ -n "$LOCAL_IMAGE_PATH" ]; then
+        echo "Image provided through shared volume"
+        echo $(ls /)
+        cp /img/$LOCAL_IMAGE_PATH balena.img
+    else
+        echo "Downloading balenaOS image..."
+        wget -q -O balena-image.zip "$IMAGE_PATH$IMAGE_VERSION"
+        unzip -o balena-image.zip
+        mv ./*.img balena.img
+    fi 
+    
+    
     # If an API token and fleet is provided, configure the image to join the fleet
     if [ -n "$API_TOKEN" ] && [ -n "$FLEET" ]; then
         echo "Configuring image with fleet configuration..."
@@ -83,7 +92,7 @@ if [ ! -f balena.qcow2 ]; then
 
     qemu-img convert -f raw -O qcow2 balena.img balena-source.qcow2 && \
     qemu-img create -f qcow2 -F qcow2 -b balena-source.qcow2 balena.qcow2 "$DISK" && \
-    rm balena.img balena-image.zip
+    rm balena.img balena-image.zip || true
 fi
 
 # Start the VM
