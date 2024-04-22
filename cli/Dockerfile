@@ -1,7 +1,7 @@
-FROM alpine:3.15.0@sha256:c74f1b1166784193ea6c8f9440263b9be6cae07dfe35e32a5df7a31358ac2060 AS base
+FROM alpine:3.19 AS base
 
 RUN apk add --update --no-cache \
-	nodejs~=16 \
+	nodejs~=20 \
 	qemu-img \
 	qemu-system-x86_64 \
 	qemu-system-aarch64 \
