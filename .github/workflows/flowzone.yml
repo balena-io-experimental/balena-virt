@@ -1,0 +1,38 @@
+name: Flowzone
+on:
+  pull_request:
+    types: [opened, synchronize, closed]
+    branches: [main, master]
+  pull_request_target:
+    types: [opened, synchronize, closed]
+    branches: [main, master]
+jobs:
+  flowzone:
+    name: Flowzone
+    if: |
+      (
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        github.event_name == 'pull_request'
+      ) || (
+        github.event.pull_request.head.repo.full_name != github.repository &&
+        github.event_name == 'pull_request_target'
+      )
+    uses: product-os/flowzone/.github/workflows/flowzone.yml@master
+    secrets: inherit
+    with:
+      docker_runs_on: >
+        {
+          "linux/amd64": ["self-hosted","distro:jammy","platform:linux/amd64"],
+          "linux/arm64": ["self-hosted","distro:jammy","platform:linux/arm64"]
+        }
+
+      docker_images: |
+        ghcr.io/balena-io-experimental/balena-virt
+
+      bake_targets: |
+        default,
+        networking,
+        cli
+
+      balena_slugs: |
+        g_joseph_alan_kogut/balenaVirt
