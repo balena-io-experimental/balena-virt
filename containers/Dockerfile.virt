@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
@@ -13,7 +13,7 @@ RUN apt-get update && \
     wget && \
     rm -rf /var/lib/apt/lists/*
 
-ARG BALENA_CLI_VERSION=v15.0.3
+ARG BALENA_CLI_VERSION=v18.2.2
 ENV PATH /app/balena-cli:$PATH
 WORKDIR /app
 
